@@ -8,7 +8,7 @@ import picamera
 import datetime
 import os
 import subprocess
-os.chdir('/home/projekt1/Desktop/Pliki/PB/Zdjecia')
+os.chdir('/home/camera/Pictures/')
 # from smbus2 import SMBus, i2c_msg
 import serial
 from PyQt5.QtWidgets import (QApplication, QDialog, QMainWindow, QFileDialog, QMessageBox)
@@ -46,7 +46,7 @@ haslo = "haslo123"
 #Zmienne sciezek
 move_script_location = "/home/camera/cut_photo.sh"
 Photo_folder_location = "/home/camera/Pictures/"
-path_master = "/home/projekt1/Desktop/Pliki/PB/Zdjecia"
+path_master = "/home/projekt1/Desktop/Pliki/PB/Zdjecia/"
 sciezka = "/home/camera/Pictures/"
 time.sleep(1)
 print("SETUP FINISHED")
@@ -109,6 +109,20 @@ class Window(QMainWindow, Ui_MainWindow):
                 print("NETWORK SHUTDOWN COMPLETE")
                 self.label.setText("Network Closed")
                 network_status = 0
+                
+                while(True): # Counting files in folder
+                    file_count = 0
+                    # Iterate directory
+                    for path in os.listdir(sciezka):
+                        # check if current path is a file
+                        if os.path.isfile(os.path.join(sciezka, path)):
+                            file_count += 1
+                    #print('File count:', file_count)
+                    if(file_count >= number_of_photos*number_of_PIs):
+                        self.mkdir_and_move_photos()
+                        break
+                
+                
             else:
                 print("NETWORK SHUTDOWN ERROR")
                 self.label.setText("Network Error")
@@ -238,7 +252,7 @@ class Window(QMainWindow, Ui_MainWindow):
                     if i < 3:
                         string_received = string_received + "."
                 master_ip = string_received
-                print("FORWARDED IP ADDRESS")            
+                print("FORWARDED IP ADDRESS :" + master_ip)            
                 network_status = 1 #ready for 'take photo' signal
                 
             # Taking photos and shutting down network            
@@ -265,9 +279,12 @@ class Window(QMainWindow, Ui_MainWindow):
                             pliki_str = pliki_str + filename +" "
                     print(pliki_str )
                     print("SENDING PHOTOS")
-                    os.system("sshpass -p "+haslo+" scp "+pliki_str+"projekt1@"+master_ip+":"+path_master)
+                    path_master_tmp = path_master[:-1]
+                    print("SENDING HERE: " + path_master_tmp)
+                    os.system("sshpass -p "+haslo+" scp "+pliki_str+"projekt1@"+master_ip+":"+path_master_tmp)
+                    print("SCP COMMAND : " + "sshpass -p "+haslo+" scp "+pliki_str+"projekt1@"+master_ip+":"+path_master_tmp)
                     #Deleting photos
-                    os.system("rm -f "+sciezka+"*")
+                    #os.system("rm -f "+sciezka+"*")
                     print("Photos deleted !")
                     print("SHUTTING DOWN NETWORK")
                     network_status = 0
@@ -321,6 +338,11 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def change_hostname(self, new_hostname):
         os.system("sudo hostnamectl set-hostname " + new_hostname)
+
+        #def mkdir_and_move_photos(self, make_path="/home/camera/zrobione"):
+    def mkdir_and_move_photos(self, make_path="/home/Desktop/Pliki/PB/zrobione"):
+        os.system("mkdir "+ make_path)
+        os.system("mv "+ master_path + "* " + make_path)
 
 
 if __name__ == "__main__":
