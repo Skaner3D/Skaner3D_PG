@@ -44,8 +44,8 @@ master_ip = ""
 
 #Zmienne sciezek
 move_script_location = "/home/camera/cut_photo.sh"
-Photo_folder_location = "/home/camera/Pictures/"
-
+#Photo_folder_location = "/home/camera/Pictures/"
+sciezka = "/home/camera/Pictures/"
 time.sleep(1)
 print("SETUP FINISHED")
 
@@ -104,6 +104,18 @@ class Window(QMainWindow, Ui_MainWindow):
                 print("NETWORK SHUTDOWN COMPLETE")
                 self.label.setText("Network Closed")
                 network_status = 0
+                
+                while(True): # Counting files in folder
+                    file_count = 0
+                    # Iterate directory
+                    for path in os.listdir(sciezka):
+                        # check if current path is a file
+                        if os.path.isfile(os.path.join(sciezka, path)):
+                            file_count += 1
+                    #print('File count:', file_count)
+                    if(file_count >= number_of_photos*number_of_PIs):
+                        
+                
             else:
                 print("NETWORK SHUTDOWN ERROR")
                 self.label.setText("Network Error")
