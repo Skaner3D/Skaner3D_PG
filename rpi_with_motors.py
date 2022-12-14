@@ -114,7 +114,9 @@ class Window(QMainWindow, Ui_MainWindow):
                             file_count += 1
                     #print('File count:', file_count)
                     if(file_count >= number_of_photos*number_of_PIs):
-                        
+                        self.mkdir_and_move_photos()
+                        break
+                
                 
             else:
                 print("NETWORK SHUTDOWN ERROR")
@@ -315,6 +317,10 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def change_hostname(self, new_hostname):
         os.system("sudo hostnamectl set-hostname " + new_hostname)
+        
+    def mkdir_and_move_photos(self, make_path="/home/camera/zrobione"):
+        os.system("mkdir "+ make_path)
+        os.system("mv "+ sciezka + "* " + make_path)
 
 
 if __name__ == "__main__":
