@@ -31,7 +31,7 @@ ser = serial.Serial("/dev/ttyS0", 9600)
 
 # Camera setup
 # ========================
-cam = picamera.PiCamera()
+cam = picamera.PiCamera()									#komentarz 3 rpi
 # GPIO.setmode (GPIO.BOARD)
 # GPIO.setup(7, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 print("CAMERA OK")
@@ -44,12 +44,13 @@ rpi_status = -1  # Master = 0, Slave = 1-7 undefined = -1
 network_status = 0  # 0 = not ok; 1 = ok
 master_ip = ""
 haslo = "haslo123"
+master_hostname = "camera"
 
 #Zmienne sciezek
 move_script_location = "/home/camera/cut_photo.sh"
 Photo_folder_location = "/home/camera/Pictures/"
-path_master = "/home/projekt1/Desktop/Pliki/PB/Zdjecia"
-#path_master = "/home/camera/Pictures/"
+#path_master = "/home/projekt1/Desktop/Pliki/PB/Zdjecia"
+path_master = "/home/camera/Pictures/"
 sciezka = "/home/camera/Pictures/"
 time.sleep(1)
 print("SETUP FINISHED")
@@ -70,7 +71,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.radioButton.clicked.connect(self.radio_master)
         self.radioButton_2.clicked.connect(self.radio_slave)
         try:
-            kit = MotorKit(i2c=board.I2C())
+            kit = MotorKit(i2c=board.I2C())                    #Komentarz wymuszajcy mastera test
             master_ip = str(subprocess.getoutput('hostname -I'))
             both_ips = master_ip.split(" ")
             
@@ -79,6 +80,7 @@ class Window(QMainWindow, Ui_MainWindow):
             print("MASTER IP: ", master_ip)
         except:
             self.program()
+            #self.take_photo(1,1)
 
     # Button Start pressed
     def start_program(self):
@@ -98,7 +100,7 @@ class Window(QMainWindow, Ui_MainWindow):
                 received_data_int = int.from_bytes(received_data, 'big')
                 if received_data_int == 9:
                     self.take_photo(rpi_status, i + 1)
-                    self.rotate_motor()
+                    #self.rotate_motor()                      TEST COMMENT !!
             self.label.setText("Process Completed")
             # Shutting down network
             print("SENDING MASTER SIGNAL TO SHUTDOWN NETWORK")
@@ -172,6 +174,7 @@ class Window(QMainWindow, Ui_MainWindow):
             print("RECEIVED DATA")
             received_data_int = int.from_bytes(received_data, 'big')
             print("CONVERTED DATA")
+            print(str(received_data_int))
             if received_data_int == number_of_PIs:
                 print("NETWORK SETUP COMPLETE")
                 self.label.setText("Network Ok")
@@ -284,8 +287,8 @@ class Window(QMainWindow, Ui_MainWindow):
                             pliki_str = pliki_str + filename +" "
                     print("WYSYLANE ZDJECIA:"+pliki_str )
                     print("SENDING PHOTOS")
-                    os.system("sshpass -p "+haslo+" scp "+pliki_str+"projekt1@"+master_ip+":"+path_master)
-                    print("WYSLANA KOMENDA: sshpass -p "+haslo+" scp "+pliki_str+"projekt1@"+master_ip+":"+path_master)
+                    os.system("sshpass -p "+haslo+" scp "+pliki_str+"camera@"+master_ip+":"+path_master)
+                    print("WYSLANA KOMENDA: sshpass -p "+haslo+" scp "+pliki_str+"camera@"+master_ip+":"+path_master)
                     #Deleting photos
                     os.system("rm -f "+sciezka+"*")
                     print("PHOTOS DELETED FROM:" +"rm -f "+sciezka+"*")
@@ -299,11 +302,12 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def take_photo(self, rpi_status, which_photo):
         filename = datetime.datetime.now().strftime(
-            "%Y-%m-%d-%H.%M.%S" + "_" + str(rpi_status) + "_" + str(which_photo) + ".jpg")
-        cam.start_preview()
-        cam.capture(filename)
+         str(rpi_status) + "_" + str(which_photo) +"_" + "%Y-%m-%d-%H.%M.%S"  + ".jpg")
+        cam.start_preview()									#komentarz 3rpi
+        cam.capture(filename)									#komentarz 3rpi
+        #os.system("scrot -u filename")
         print("CAPTURED %s" % filename)
-        cam.stop_preview()
+        cam.stop_preview()										#komentarz 3 rpi
 
     # To do
     def rotate_motor(self):
@@ -342,8 +346,8 @@ class Window(QMainWindow, Ui_MainWindow):
     def change_hostname(self, new_hostname):
         os.system("sudo hostnamectl set-hostname " + new_hostname)
 
-    def mkdir_and_move_photos(self, make_path="/home/projekt1/Desktop/Pliki/PB/zrobione"):
-    #def mkdir_and_move_photos(self, make_path="/home/camera/zrobione"):
+    #def mkdir_and_move_photos(self, make_path="/home/projekt1/Desktop/Pliki/PB/zrobione"):
+    def mkdir_and_move_photos(self, make_path="/home/camera/zrobione"):
         make_path = make_path + "_" + datetime.datetime.now().strftime(
                     "%Y-%m-%d-%H.%M.%S")
         os.system("mkdir "+ make_path)
