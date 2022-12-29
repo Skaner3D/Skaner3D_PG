@@ -1,0 +1,16 @@
+Aktualizacje:
+- Plik ui.py -> nowy plik z dodanymi przyciskami reboot i update
+- Plik rpi_scanner_OK zmiany nalezy przekopiwoac do dzialajacej wersji programu:
+	- 50 linijka zmienna sciezka_output
+	- 68 i 69 linijka dodanie powiazan nowych przyciskow z funkcjami
+	- 75 linijka ustawianie zmiennej rpi_status na 0 
+	- 146 linijka zaktualizowana funkcja close_program 
+		-> jak nie ma sieci to zamyka program
+		-> jak jest siec to wysyla informacje o zamknieciu programu i zamyka program
+	- 178 linijka zaktualizowana funkcja save 
+		-> zmienna sciezka_output jest zapisywana z pola ui
+	- 240 linijka nowa funkcja update_code
+	- 264 linijka nowa funkcja reboot_pi
+	- 292 linijka dodany komentarz komendy terminala do aktualizacji pliku ui.py
+	- linie 358~378 dodana obsluga nowych funkcji z gui dla slave'a
+	- 449 linijka zmiana make_patha na sciezka_output + zrobione
