@@ -1,14 +1,6 @@
 # -*- coding: utf-8 -*-
 
-<<<<<<< Updated upstream
-# Form implementation generated from reading ui file 'ui/Ui_MainWindow.ui'
-=======
-<<<<<<< HEAD
 # Form implementation generated from reading ui file 'Ui_MainWindow.ui'
-=======
-# Form implementation generated from reading ui file 'ui/Ui_MainWindow.ui'
->>>>>>> 99bb4622e21755b31ea47ce2d3c7d1e3b8b49b35
->>>>>>> Stashed changes
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -30,25 +22,11 @@ class Ui_MainWindow(object):
         self.groupBox.setObjectName("groupBox")
         self.radioButton = QtWidgets.QRadioButton(self.groupBox)
         self.radioButton.setGeometry(QtCore.QRect(0, 30, 113, 28))
-<<<<<<< Updated upstream
-        self.radioButton.setObjectName("radioButton")
-        self.radioButton_2 = QtWidgets.QRadioButton(self.groupBox)
-        self.radioButton_2.setGeometry(QtCore.QRect(80, 30, 113, 28))
-        self.radioButton_2.setChecked(True)
-=======
-<<<<<<< HEAD
         self.radioButton.setChecked(True)
         self.radioButton.setObjectName("radioButton")
         self.radioButton_2 = QtWidgets.QRadioButton(self.groupBox)
         self.radioButton_2.setGeometry(QtCore.QRect(80, 30, 113, 28))
         self.radioButton_2.setChecked(False)
-=======
-        self.radioButton.setObjectName("radioButton")
-        self.radioButton_2 = QtWidgets.QRadioButton(self.groupBox)
-        self.radioButton_2.setGeometry(QtCore.QRect(80, 30, 113, 28))
-        self.radioButton_2.setChecked(True)
->>>>>>> 99bb4622e21755b31ea47ce2d3c7d1e3b8b49b35
->>>>>>> Stashed changes
         self.radioButton_2.setObjectName("radioButton_2")
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(200, 70, 91, 30))
@@ -88,44 +66,23 @@ class Ui_MainWindow(object):
         self.lineEdit.setGeometry(QtCore.QRect(0, 30, 113, 30))
         self.lineEdit.setObjectName("lineEdit")
         self.groupBox_5 = QtWidgets.QGroupBox(self.centralwidget)
-<<<<<<< Updated upstream
-        self.groupBox_5.setGeometry(QtCore.QRect(0, 200, 351, 71))
-=======
-<<<<<<< HEAD
         self.groupBox_5.setGeometry(QtCore.QRect(0, 200, 271, 71))
->>>>>>> Stashed changes
         self.groupBox_5.setObjectName("groupBox_5")
         self.lineEdit_2 = QtWidgets.QLineEdit(self.groupBox_5)
-        self.lineEdit_2.setGeometry(QtCore.QRect(0, 30, 341, 30))
+        self.lineEdit_2.setGeometry(QtCore.QRect(0, 30, 241, 30))
         self.lineEdit_2.setObjectName("lineEdit_2")
         self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_3.setGeometry(QtCore.QRect(200, 140, 91, 30))
+        self.pushButton_3.setGeometry(QtCore.QRect(200, 120, 91, 30))
         self.pushButton_3.setObjectName("pushButton_3")
         self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_4.setGeometry(QtCore.QRect(320, 140, 91, 30))
+        self.pushButton_4.setGeometry(QtCore.QRect(320, 120, 91, 30))
         self.pushButton_4.setObjectName("pushButton_4")
-<<<<<<< Updated upstream
-=======
         self.pushButton_5 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_5.setGeometry(QtCore.QRect(200, 170, 91, 30))
         self.pushButton_5.setObjectName("pushButton_5")
         self.pushButton_6 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_6.setGeometry(QtCore.QRect(320, 170, 91, 30))
         self.pushButton_6.setObjectName("pushButton_6")
-=======
-        self.groupBox_5.setGeometry(QtCore.QRect(0, 200, 351, 71))
-        self.groupBox_5.setObjectName("groupBox_5")
-        self.lineEdit_2 = QtWidgets.QLineEdit(self.groupBox_5)
-        self.lineEdit_2.setGeometry(QtCore.QRect(0, 30, 341, 30))
-        self.lineEdit_2.setObjectName("lineEdit_2")
-        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_3.setGeometry(QtCore.QRect(200, 140, 91, 30))
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_4.setGeometry(QtCore.QRect(320, 140, 91, 30))
-        self.pushButton_4.setObjectName("pushButton_4")
->>>>>>> 99bb4622e21755b31ea47ce2d3c7d1e3b8b49b35
->>>>>>> Stashed changes
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -159,20 +116,8 @@ class Ui_MainWindow(object):
         self.groupBox_4.setTitle(_translate("MainWindow", "Number of PIs"))
         self.lineEdit.setText(_translate("MainWindow", "8"))
         self.groupBox_5.setTitle(_translate("MainWindow", "Save to Directory"))
-<<<<<<< Updated upstream
-        self.lineEdit_2.setText(_translate("MainWindow", "/home/projekt1/Desktop/Pliki/PB/Zdjecia"))
-        self.pushButton_3.setText(_translate("MainWindow", "Save"))
-        self.pushButton_4.setText(_translate("MainWindow", "Set up"))
-=======
-<<<<<<< HEAD
         self.lineEdit_2.setText(_translate("MainWindow", "/home/camera/Pictures"))
         self.pushButton_3.setText(_translate("MainWindow", "Save"))
         self.pushButton_4.setText(_translate("MainWindow", "Set up"))
         self.pushButton_5.setText(_translate("MainWindow", "Update"))
         self.pushButton_6.setText(_translate("MainWindow", "Reboot"))
-=======
-        self.lineEdit_2.setText(_translate("MainWindow", "/home/projekt1/Desktop/Pliki/PB/Zdjecia"))
-        self.pushButton_3.setText(_translate("MainWindow", "Save"))
-        self.pushButton_4.setText(_translate("MainWindow", "Set up"))
->>>>>>> 99bb4622e21755b31ea47ce2d3c7d1e3b8b49b35
->>>>>>> Stashed changes

@@ -1,0 +1,5 @@
+sudo nano /etc/rc.local
+delete printing IP adress
+add python run command i.e. python /home/camera/GUI/motor.py &
+save and reboot
+
