@@ -1,0 +1,14 @@
+Do zrobienia:
+-wrzucanie wszystkih zdjec do nowo utworzonego folderu o jakiejs nazwie
+	chyba po netowrok connection shut down --> petla while true sprawdza ilosc zdjec w folderze jak jest ok tworzy nowy i wrzuca tam zdjecia
+-dodac ten skrypt pythona do boota zeby [przy odpaleniu raspby sie robil
+-zrobic zeby sciezki dzialaly po zrobieniu obrazu ( wszedzie te same master/slave)
+
+Potem:
+- obraz systemu zeby moc wgrywac na karte sd
+
+
+
+Potem optem :
+stelaz czy cos
+no i ta fotogrammetria
