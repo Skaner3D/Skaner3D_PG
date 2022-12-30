@@ -62,6 +62,7 @@ print("SETUP FINISHED")
 class Window(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         global master_ip
+        global rpi_status
         super().__init__(parent)
         self.setupUi(self)
         self.pushButton_3.clicked.connect(self.save_settings)  # save_settings
@@ -460,7 +461,11 @@ class Window(QMainWindow, Ui_MainWindow):
         os.system("sudo hostnamectl set-hostname " + new_hostname)
 
     #def mkdir_and_move_photos(self, make_path=path_master):
-    def mkdir_and_move_photos(self, make_path=sciezka_output+"zrobione"):
+    def mkdir_and_move_photos(self):
+        make_path=sciezka_output+"zrobione"
+        print(sciezka_output)
+        print(make_path)
+        print(path_master) 
         make_path = make_path + "_" + datetime.datetime.now().strftime(
                     "%Y-%m-%d-%H.%M.%S")
         os.system("mkdir "+ make_path)
