@@ -6,8 +6,8 @@ parser.add_argument('--foreward',action='store_true')
 parser.add_argument('-v', action='store_true')
 args = parser.parse_args()
 haslo = "haslo123"
-update_exe = "python git_update.py"
-
+update_exe = "python /home/camera/Skaner/git_upload.py"
+os.chdir("/home/camera/Skaner/")
 if args.foreward==True:
     for num in range(8):
         try:
