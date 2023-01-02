@@ -64,17 +64,18 @@ class Window(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         global master_ip
         global rpi_status
-        super().__init__(parent)
-        self.setupUi(self)
-        self.pushButton_3.clicked.connect(self.save_settings)  # save_settings
-        self.pushButton_4.clicked.connect(self.setup_connection)  # Conncetion setup
-        self.pushButton_5.clicked.connect(self.update_code)  # Update          #zminaa
-        self.pushButton_6.clicked.connect(self.reboot_pi)  # Reboot            #zmiana
-        self.pushButton_2.clicked.connect(self.close_program)  # Close
-        self.pushButton.clicked.connect(self.start_program)  # Start
-        self.radioButton.clicked.connect(self.radio_master)
-        self.radioButton_2.clicked.connect(self.radio_slave)
         try:
+            super().__init__(parent)
+            self.setupUi(self)
+            self.pushButton_3.clicked.connect(self.save_settings)  # save_settings
+            self.pushButton_4.clicked.connect(self.setup_connection)  # Conncetion setup
+            self.pushButton_5.clicked.connect(self.update_code)  # Update          #zminaa
+            self.pushButton_6.clicked.connect(self.reboot_pi)  # Reboot            #zmiana
+            self.pushButton_2.clicked.connect(self.close_program)  # Close
+            self.pushButton.clicked.connect(self.start_program)  # Start
+            self.radioButton.clicked.connect(self.radio_master)
+            self.radioButton_2.clicked.connect(self.radio_slave)
+        #try:
             kit = MotorKit(i2c=board.I2C())
             rpi_status = 0                                                 #zmiana
             master_ip = str(subprocess.getoutput('hostname -I'))
