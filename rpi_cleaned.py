@@ -436,7 +436,7 @@ def mkdir_and_move_photos():
     os.system("mkdir "+ make_path)
     os.system("mv "+ path_master + "/* " + make_path)
 
-if __name__ == "__main__":
+def test():
     try:
         kit = MotorKit(i2c=board.I2C())
         app = QApplication(sys.argv)
@@ -451,6 +451,9 @@ if __name__ == "__main__":
     win.show()
     sys.exit(app.exec())
 
+if __name__ == "__main__":
+    test()
+    
 
 # Koniec programu
 # ==================================================
