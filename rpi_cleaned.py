@@ -287,11 +287,160 @@ class Window(QMainWindow, Ui_MainWindow):
 
 
 
+
+
+
+def program_slave():
+    print("STARTING PROGRAM")
+    ktore_zdjecie = 0
+    while True:
+        print("")
+        # Assigning rpi_status
+        if (network_status == 0 and rpi_status == -1):  # Network not setup and RPI Status undefined
+            print("WAITING FOR MASTER SIGNAL")
+            received_data = ser.read()
+            received_data_int = int.from_bytes(received_data, 'big')
+            #====================================== nowe
+            print("MASTER SIGNAL: ", received_data_int)
+            #======================================
+            if received_data_int >= 1 and received_data_int < 9:  # 0 = networkoff; 9 = take photo ; 1~9 = pass on incremented signal
+                rpi_status = received_data_int  # RPI Slave number was received
+                #self.change_hostname("SLAVE" + str(rpi_status))
+                network_status = 2 #need to get ip
+                msg = rpi_status + 1
+                ser.write(msg.to_bytes(1, 'big'))
+                print("FORWARDING MASTER SIGNAL")
+        #Saving and forwarding master ip
+        if network_status ==2:
+            
+            print("WAITING FOR MASTER IP")
+            #received_data = ser.read()
+            #received_data_str = str.from_bytes(received_data, 'big')
+            #master_ip = received_data_str
+            #print("MASTER IP: ", master_ip)
+            string_received = ""
+            for i in range(4):                
+                received_data = ser.read()
+                ser.write(received_data)    
+                received_data_int = int.from_bytes(received_data, 'big')
+                received_data_str = str(received_data_int)
+                string_received = string_received + received_data_str
+                if i < 3:
+                    string_received = string_received + "."
+            master_ip = string_received
+            print("Master IP:" + master_ip)
+            print("FORWARDED IP ADDRESS")            
+            network_status = 1 #ready for 'take photo' signal
+            
+        # Taking photos and shutting down network            
+        if network_status == 1 and rpi_status >= 1:  # Network setup and RPI Slave
+            received_data = ser.read()
+            received_data_int = int.from_bytes(received_data, 'big')
+            if received_data_int == 9:  # Revieved signal to take photo
+                print("RECEIVED SIGNAL TO TAKE PHOTO")
+                print("FORWARDING SINGAL")
+                ser.write(received_data_int.to_bytes(1, 'big'))
+                print("TAKING PHOTO")
+                ktore_zdjecie += 1
+                self.take_photo(rpi_status, ktore_zdjecie)
+             #===========================================
+            if received_data_int == 1:  # Received signal to update program
+                print("RECEIVED SIGNAL TO UPDATE PROGRAM")
+                print("FORWARDING SINGAL")
+                ser.write(received_data_int.to_bytes(1, 'big'))
+                # slave update code here
+            if received_data_int == 2:  # Received signal to reboot system
+                print("RECEIVED SIGNAL TO REBOOT SYSTEM")
+                print("FORWARDING SINGAL")
+                ser.write(received_data_int.to_bytes(1, 'big'))                    
+                print("REBOOT IN 10 SECONDS")
+                time.sleep(10)
+                os.system("sudo reboot now")
+            if received_data_int == 3:  # Received signal to reboot system
+                print("RECEIVED SIGNAL TO CLOSE PROGRAM")
+                print("FORWARDING SINGAL")
+                ser.write(received_data_int.to_bytes(1, 'big'))                    
+                print("CLOSING PROGRAM")
+                time.sleep(10)
+                sys.exit()
+            #===========================================
+            if received_data_int == 0:  # Recieved signal to shut down network
+                print("RECEIVED SIGNAL TO SHUT DOWN NETWORK")
+                print("FORWARDING SINGAL")
+                ser.write(received_data_int.to_bytes(1, 'big'))
+                #Sending photos
+                pliki_str = ""                    
+                for path in os.listdir(sciezka):
+                    filename = os.path.join(sciezka,path)
+                    
+                    if os.path.isfile(filename):
+                        pliki_str = pliki_str + filename +" "
+                print("WYSYLANE ZDJECIA:"+pliki_str )
+                print("SENDING PHOTOS")
+                os.system("sshpass -p "+haslo+" scp "+pliki_str+"camera@"+master_ip+":"+path_master)
+                print("WYSLANA KOMENDA: sshpass -p "+haslo+" scp "+pliki_str+"projekt1@"+master_ip+":"+path_master)
+                #Deleting photos
+                os.system("rm -f "+sciezka+"*")
+                print("PHOTOS DELETED FROM:" +"rm -f "+sciezka+"*")
+                print("SHUTTING DOWN NETWORK")
+                network_status = 0
+                ktore_zdjecie = 0
+                rpi_status = -1
+        else:  # RPI as Master
+            print("")
+        time.sleep(0.5)
+
+def take_photo(rpi_status, which_photo):
+    filename = datetime.datetime.now().strftime(
+        str(rpi_status) + "_" + str(which_photo) + "_" +"%Y-%m-%d-%H.%M.%S"  + ".jpg")
+    cam.start_preview()
+    cam.capture(filename)
+    #os.system("scrot -u filename")
+    print("CAPTURED %s" % filename)
+    cam.stop_preview()
+
+# To do
+def rotate_motor():
+    #++++++++++++++
+    kit = MotorKit(i2c=board.I2C())
+    #++++++++++++++
+    #1600 steps = 360dgr dla stolu
+    # 200 steps /360 degrees for NEMA 17 JK42HS40-0504 stepper motor
+    n_zebow_silnika = 20
+    n_zebow_stolu = 160
+    przelozenie = n_zebow_stolu/n_zebow_silnika
+    single_step = 1.8  # degrees
+    degrees_per_photo = przelozenie * 360 / number_of_photos
+    steps_per_photo = degrees_per_photo / single_step
+    for i in range(int(steps_per_photo)):
+        kit.stepper1.onestep(style=stepper.DOUBLE)
+    print("MOTOR ROTATED")
+    time.sleep(1)
+
+def move_photos(source):
+    if source[-1] != "/":
+        source = source + "/"
+    os.system("sh " + move_script_location + " " + source)
+
+def change_hostname(new_hostname):
+    os.system("sudo hostnamectl set-hostname " + new_hostname)
+
+#def mkdir_and_move_photos(self, make_path=path_master):
+def mkdir_and_move_photos():
+    make_path=sciezka_output+"zrobione"
+    print(sciezka_output)
+    print(make_path)
+    print(path_master) 
+    make_path = make_path + "_" + datetime.datetime.now().strftime(
+                "%Y-%m-%d-%H.%M.%S")
+    os.system("mkdir "+ make_path)
+    os.system("mv "+ path_master + "/* " + make_path)
+
 if __name__ == "__main__":
     try:
-        app = QApplication(sys.argv)
-        win = Window()
         kit = MotorKit(i2c=board.I2C())
+        app = QApplication(sys.argv)
+        win = Window()        
         rpi_status = 0                                                 #zmiana
         master_ip = str(subprocess.getoutput('hostname -I'))
         both_ips = master_ip.split(" ")
@@ -303,174 +452,25 @@ if __name__ == "__main__":
     sys.exit(app.exec())
 
 
-    def program_slave():
-        print("STARTING PROGRAM")
-        global network_status
-        global rpi_status
-        global master_ip
-        ktore_zdjecie = 0
-        while True:
-            print("")
-            # Assigning rpi_status
-            if (network_status == 0 and rpi_status == -1):  # Network not setup and RPI Status undefined
-                print("WAITING FOR MASTER SIGNAL")
-                received_data = ser.read()
-                received_data_int = int.from_bytes(received_data, 'big')
-                #====================================== nowe
-                print("MASTER SIGNAL: ", received_data_int)
-                #======================================
-                if received_data_int >= 1 and received_data_int < 9:  # 0 = networkoff; 9 = take photo ; 1~9 = pass on incremented signal
-                    rpi_status = received_data_int  # RPI Slave number was received
-                    #self.change_hostname("SLAVE" + str(rpi_status))
-                    network_status = 2 #need to get ip
-                    msg = rpi_status + 1
-                    ser.write(msg.to_bytes(1, 'big'))
-                    print("FORWARDING MASTER SIGNAL")
-            #Saving and forwarding master ip
-            if network_status ==2:
-                
-                print("WAITING FOR MASTER IP")
-                #received_data = ser.read()
-                #received_data_str = str.from_bytes(received_data, 'big')
-                #master_ip = received_data_str
-                #print("MASTER IP: ", master_ip)
-                string_received = ""
-                for i in range(4):                
-                    received_data = ser.read()
-                    ser.write(received_data)    
-                    received_data_int = int.from_bytes(received_data, 'big')
-                    received_data_str = str(received_data_int)
-                    string_received = string_received + received_data_str
-                    if i < 3:
-                        string_received = string_received + "."
-                master_ip = string_received
-                print("Master IP:" + master_ip)
-                print("FORWARDED IP ADDRESS")            
-                network_status = 1 #ready for 'take photo' signal
-                
-            # Taking photos and shutting down network            
-            if network_status == 1 and rpi_status >= 1:  # Network setup and RPI Slave
-                received_data = ser.read()
-                received_data_int = int.from_bytes(received_data, 'big')
-                if received_data_int == 9:  # Revieved signal to take photo
-                    print("RECEIVED SIGNAL TO TAKE PHOTO")
-                    print("FORWARDING SINGAL")
-                    ser.write(received_data_int.to_bytes(1, 'big'))
-                    print("TAKING PHOTO")
-                    ktore_zdjecie += 1
-                    self.take_photo(rpi_status, ktore_zdjecie)
-                 #===========================================
-                if received_data_int == 1:  # Received signal to update program
-                    print("RECEIVED SIGNAL TO UPDATE PROGRAM")
-                    print("FORWARDING SINGAL")
-                    ser.write(received_data_int.to_bytes(1, 'big'))
-                    # slave update code here
-                if received_data_int == 2:  # Received signal to reboot system
-                    print("RECEIVED SIGNAL TO REBOOT SYSTEM")
-                    print("FORWARDING SINGAL")
-                    ser.write(received_data_int.to_bytes(1, 'big'))                    
-                    print("REBOOT IN 10 SECONDS")
-                    time.sleep(10)
-                    os.system("sudo reboot now")
-                if received_data_int == 3:  # Received signal to reboot system
-                    print("RECEIVED SIGNAL TO CLOSE PROGRAM")
-                    print("FORWARDING SINGAL")
-                    ser.write(received_data_int.to_bytes(1, 'big'))                    
-                    print("CLOSING PROGRAM")
-                    time.sleep(10)
-                    sys.exit()
-                #===========================================
-                if received_data_int == 0:  # Recieved signal to shut down network
-                    print("RECEIVED SIGNAL TO SHUT DOWN NETWORK")
-                    print("FORWARDING SINGAL")
-                    ser.write(received_data_int.to_bytes(1, 'big'))
-                    #Sending photos
-                    pliki_str = ""                    
-                    for path in os.listdir(sciezka):
-                        filename = os.path.join(sciezka,path)
-                        
-                        if os.path.isfile(filename):
-                            pliki_str = pliki_str + filename +" "
-                    print("WYSYLANE ZDJECIA:"+pliki_str )
-                    print("SENDING PHOTOS")
-                    os.system("sshpass -p "+haslo+" scp "+pliki_str+"camera@"+master_ip+":"+path_master)
-                    print("WYSLANA KOMENDA: sshpass -p "+haslo+" scp "+pliki_str+"projekt1@"+master_ip+":"+path_master)
-                    #Deleting photos
-                    os.system("rm -f "+sciezka+"*")
-                    print("PHOTOS DELETED FROM:" +"rm -f "+sciezka+"*")
-                    print("SHUTTING DOWN NETWORK")
-                    network_status = 0
-                    ktore_zdjecie = 0
-                    rpi_status = -1
-            else:  # RPI as Master
-                print("")
-            time.sleep(0.5)
-
-    def take_photo(rpi_status, which_photo):
-        filename = datetime.datetime.now().strftime(
-            str(rpi_status) + "_" + str(which_photo) + "_" +"%Y-%m-%d-%H.%M.%S"  + ".jpg")
-        cam.start_preview()
-        cam.capture(filename)
-        #os.system("scrot -u filename")
-        print("CAPTURED %s" % filename)
-        cam.stop_preview()
-
-    # To do
-    def rotate_motor():
-        #++++++++++++++
-        kit = MotorKit(i2c=board.I2C())
-        #++++++++++++++
-        global number_of_photos
-        #1600 steps = 360dgr dla stolu
-        # 200 steps /360 degrees for NEMA 17 JK42HS40-0504 stepper motor
-        n_zebow_silnika = 20
-        n_zebow_stolu = 160
-        przelozenie = n_zebow_stolu/n_zebow_silnika
-        single_step = 1.8  # degrees
-        degrees_per_photo = przelozenie * 360 / number_of_photos
-        steps_per_photo = degrees_per_photo / single_step
-        for i in range(int(steps_per_photo)):
-            kit.stepper1.onestep(style=stepper.DOUBLE)
-        print("MOTOR ROTATED")
-        time.sleep(1)
-        
-    # Not used
-    def print_label(text):
-        print(text)
-        self.label.setText(str(text))
-
-    # Not used
-    def serial_port(value):
-        value = 0
-        ser.write(value.to_bytes(1, 'big'))
-        received_data = ser.read()
-        received_data_int = int.from_bytes(received_data, 'big')
-        print("ARDUINO BUTTON: " + str(received_data_int))  # str(received_data))#str(received_data, 'utf-8'))
-        print(received_data_int)
-        return received_data_int
-
-    def move_photos(source):
-        if source[-1] != "/":
-            source = source + "/"
-        os.system("sh " + move_script_location + " " + source)
-
-    def change_hostname(new_hostname):
-        os.system("sudo hostnamectl set-hostname " + new_hostname)
-
-    #def mkdir_and_move_photos(self, make_path=path_master):
-    def mkdir_and_move_photos():
-        make_path=sciezka_output+"zrobione"
-        print(sciezka_output)
-        print(make_path)
-        print(path_master) 
-        make_path = make_path + "_" + datetime.datetime.now().strftime(
-                    "%Y-%m-%d-%H.%M.%S")
-        os.system("mkdir "+ make_path)
-        os.system("mv "+ path_master + "/* " + make_path)
-
-
 # Koniec programu
 # ==================================================
+
+        
+#    # Not used
+#    def print_label(text):
+#        print(text)
+#        self.label.setText(str(text))
+
+#    # Not used
+#    def serial_port(value):
+#        value = 0
+#        ser.write(value.to_bytes(1, 'big'))
+#        received_data = ser.read()
+#        received_data_int = int.from_bytes(received_data, 'big')
+#        print("ARDUINO BUTTON: " + str(received_data_int))  # str(received_data))#str(received_data, 'utf-8'))
+#        print(received_data_int)
+#        return received_data_int
+
 
 # Syf
 # =================
