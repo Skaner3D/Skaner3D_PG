@@ -288,8 +288,8 @@ class Window(QMainWindow, Ui_MainWindow):
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
     try:
+        app = QApplication(sys.argv)
         win = Window()
         kit = MotorKit(i2c=board.I2C())
         rpi_status = 0                                                 #zmiana
