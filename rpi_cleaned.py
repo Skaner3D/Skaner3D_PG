@@ -292,6 +292,9 @@ class Window(QMainWindow, Ui_MainWindow):
 
 def program_slave():
     print("STARTING PROGRAM")
+    global network_status
+    global rpi_status
+    global master_ip
     ktore_zdjecie = 0
     while True:
         print("")
@@ -404,6 +407,8 @@ def rotate_motor():
     #++++++++++++++
     kit = MotorKit(i2c=board.I2C())
     #++++++++++++++
+    global number_of_photos
+
     #1600 steps = 360dgr dla stolu
     # 200 steps /360 degrees for NEMA 17 JK42HS40-0504 stepper motor
     n_zebow_silnika = 20
