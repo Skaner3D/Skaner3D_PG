@@ -20,7 +20,8 @@ from ui import Ui_MainWindow
 import board
 from adafruit_motorkit import MotorKit
 from adafruit_motor import stepper
-
+# do uploadu na gita
+import argparse
 
 print("STARTING SETUP")
 
@@ -74,15 +75,12 @@ class Window(QMainWindow, Ui_MainWindow):
         self.radioButton.clicked.connect(self.radio_master)
         self.radioButton_2.clicked.connect(self.radio_slave)
         try:
-            
             kit = MotorKit(i2c=board.I2C())
             rpi_status = 0                                                 #zmiana
             master_ip = str(subprocess.getoutput('hostname -I'))
             both_ips = master_ip.split(" ")
-            
-            master_ip = both_ips[0]
-            
-            print("MASTER IP: ", master_ip)
+            master_ip = both_ips[0]            
+            print("MASTER IP: ", master_ip)            
         except:
             self.program()
 
@@ -244,25 +242,12 @@ class Window(QMainWindow, Ui_MainWindow):
     def update_code(self):
         print("UPDATE BUTTON PRESSED")
         self.label.setText("Update button pressed")
-        print("SENDING MASTER SIGNAL TO UPDATE PROGRAM")
-        #sending signal to slaves
-        msg = 1
-        ser.write(msg.to_bytes(1, 'big'))
-        print("WAITING FOR SLAVE SIGNAL")
-        time.sleep(1)
-        print("SLEPT")
-        received_data = ser.read()
-        print("RECEIVED DATA")
-        received_data_int = int.from_bytes(received_data, 'big')
-        print("CONVERTED DATA")
-        if received_data_int == msg:
-            print("UPDATE SIGNAL SENDING COMPLETE")
-            self.label.setText("Update Pending")
-            # master update code here            
-        else:
-            print("UPDATE SIGNAL SENDING FAIL")
-            self.label.setText("Update Fail")
         
+    
+    def funkcja_upload_git(self):
+        pass
+
+    
     # Reboot button pressed                             #nowa funkcja
     def reboot_pi(self):
         if network_status != 1:
@@ -322,6 +307,9 @@ class Window(QMainWindow, Ui_MainWindow):
                 print("WAITING FOR MASTER SIGNAL")
                 received_data = ser.read()
                 received_data_int = int.from_bytes(received_data, 'big')
+                #====================================== nowe
+                print("MASTER SIGNAL: ", received_data_int)
+                #======================================
                 if received_data_int >= 1 and received_data_int < 9:  # 0 = networkoff; 9 = take photo ; 1~9 = pass on incremented signal
                     rpi_status = received_data_int  # RPI Slave number was received
                     #self.change_hostname("SLAVE" + str(rpi_status))
@@ -537,3 +525,25 @@ if __name__ == "__main__":
 #    else:
 #        print ("ARDUINO BUTTON NOT PRESSED")
 #        return 0
+
+
+#print("SENDING MASTER SIGNAL TO UPDATE PROGRAM")
+#        #sending signal to slaves
+#        msg = 1
+#        ser.write(msg.to_bytes(1, 'big'))
+#        print("WAITING FOR SLAVE SIGNAL")
+#        time.sleep(1)
+#        print("SLEPT")
+#        received_data = ser.read()
+#        print("RECEIVED DATA")
+#        received_data_int = int.from_bytes(received_data, 'big')
+#        print("CONVERTED DATA")
+#        if received_data_int == msg:
+#            print("UPDATE SIGNAL SENDING COMPLETE")
+#            self.label.setText("Update Pending")
+#            # master update code here
+#            funkcja_upload_git()
+#       else:
+#            print("UPDATE SIGNAL SENDING FAIL")
+#            self.label.setText("Update Fail")
+            
