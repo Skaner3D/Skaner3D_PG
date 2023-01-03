@@ -86,8 +86,8 @@ class Window(QMainWindow, Ui_MainWindow):
             for i in range(number_of_photos):
                 self.label.setText("Photo " + str(i + 1) + "/" + str(number_of_photos) + "...")
                 print("Photo " + str(i + 1) + "/" + str(number_of_photos) + "...")
-                self.rotate_motor()
-                self.take_photo(rpi_status, i + 1) #swapped
+                rotate_motor()
+                take_photo(rpi_status, i + 1) #swapped
                 msg = 9
                 ser.write(msg.to_bytes(1, 'big'))  # 'Take a photo' signal
                 time.sleep(1)
@@ -118,7 +118,7 @@ class Window(QMainWindow, Ui_MainWindow):
                     #print('File count:', file_count)
                     if(file_count >= number_of_photos*number_of_PIs):
                         print("Moving Photos")
-                        self.mkdir_and_move_photos()
+                        mkdir_and_move_photos()
                         break
                 print("Moving DONE")
                 
@@ -194,6 +194,7 @@ class Window(QMainWindow, Ui_MainWindow):
             received_data = ser.read()
             print("RECEIVED DATA")
             received_data_int = int.from_bytes(received_data, 'big')
+            print("RECEIVED DATA:", received_data_int)
             print("CONVERTED DATA")
             if received_data_int == number_of_PIs:
                 print("NETWORK SETUP COMPLETE")
@@ -221,6 +222,7 @@ class Window(QMainWindow, Ui_MainWindow):
                 string_received = string_received + received_data_str
                 if element < 3:
                     string_received = string_received + "."
+            print("IP RECEIVED:", string_received)
             if string_received == master_ip:
                 print("Received IP OK ")
             else:
@@ -345,7 +347,7 @@ def program_slave():
                 ser.write(received_data_int.to_bytes(1, 'big'))
                 print("TAKING PHOTO")
                 ktore_zdjecie += 1
-                self.take_photo(rpi_status, ktore_zdjecie)
+                take_photo(rpi_status, ktore_zdjecie)
              #===========================================
             if received_data_int == 1:  # Received signal to update program
                 print("RECEIVED SIGNAL TO UPDATE PROGRAM")
@@ -443,6 +445,8 @@ def mkdir_and_move_photos():
 
 def test():
     try:
+        global rpi_status
+        global master_ip
         kit = MotorKit(i2c=board.I2C())
         app = QApplication(sys.argv)
         win = Window()        
